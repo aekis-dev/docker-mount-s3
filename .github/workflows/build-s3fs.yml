@@ -1,4 +1,4 @@
-name: Release docker-s3fs
+name: Release docker-mount-s3
 
 on:
   push:

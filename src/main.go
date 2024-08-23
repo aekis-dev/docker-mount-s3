@@ -9,17 +9,17 @@ import (
 	"github.com/docker/go-plugins-helpers/volume"
 )
 
-type s3fsDriver struct {
-	defaultS3fsopts string
+type mountS3Driver struct {
+	defaultMountS3opts string
 	Driver
 }
 
-func (p *s3fsDriver) Validate(req *volume.CreateRequest) error {
+func (p *mountS3Driver) Validate(req *volume.CreateRequest) error {
 	return nil
 }
 
-func (p *s3fsDriver) MountOptions(req *volume.CreateRequest) ([]string, error) {
-	s3fsopts, s3fsoptsInOpts := req.Options["o"]
+func (p *mountS3Driver) MountOptions(req *volume.CreateRequest) ([]string, error) {
+	mounts3opts, mounts3optsInOpts := req.Options["o"]
 	bucket, bucketInOpts := req.Options["bucket"]
 	folder, folderInOpts := req.Options["folder"]
 
@@ -27,33 +27,31 @@ func (p *s3fsDriver) MountOptions(req *volume.CreateRequest) ([]string, error) {
 		return nil, errors.New("driver option 'bucket' is mandatory")
 	}
 
-	var s3fsoptsArray []string
-	if s3fsoptsInOpts && s3fsopts != "" {
-		s3fsoptsArray = append(s3fsoptsArray, strings.Split(s3fsopts, ",")...)
-	} else if p.defaultS3fsopts != "" {
-		s3fsoptsArray = append(s3fsoptsArray, strings.Split(p.defaultS3fsopts, ",")...)
+	var mounts3optsArray []string
+	mounts3optsArray = append(mounts3optsArray, bucket)
+	if mounts3optsInOpts && mounts3opts != "" {
+		mounts3optsArray = append(mounts3optsArray, strings.Split(mounts3opts, " ")...)
+	} else if p.defaultMountS3opts != "" {
+		mounts3optsArray = append(mounts3optsArray, strings.Split(p.defaultMountS3opts, " ")...)
 	}
-	bucketOption := "bucket=" + bucket
 	if folderInOpts {
-		bucketOption = bucketOption + ":/" + folder
+		mounts3optsArray = append(mounts3optsArray, "--prefix", folder)
 	}
-	s3fsoptsArray = append(s3fsoptsArray, bucketOption)
-
-	return []string{"-o", strings.Join(s3fsoptsArray, ",")}, nil
+	return mounts3optsArray, nil
 }
 
-func (p *s3fsDriver) PreMount(req *volume.MountRequest) error {
+func (p *mountS3Driver) PreMount(req *volume.MountRequest) error {
 	return nil
 }
 
-func (p *s3fsDriver) PostMount(req *volume.MountRequest) {
+func (p *mountS3Driver) PostMount(req *volume.MountRequest) {
 }
 
-func buildDriver() *s3fsDriver {
-	defaultsopts := os.Getenv("DEFAULT_S3FSOPTS")
-	d := &s3fsDriver{
-		Driver:          *NewDriver("s3fs", false, "s3fs", "local"),
-		defaultS3fsopts: defaultsopts,
+func buildDriver() *mountS3Driver {
+	defaultsopts := os.Getenv("DEFAULT_MOUNT_S3OPTS")
+	d := &mountS3Driver{
+		Driver:             *NewDriver("mount-s3", true, "mount-s3", "local"),
+		defaultMountS3opts: defaultsopts,
 	}
 	d.Init(d)
 	return d

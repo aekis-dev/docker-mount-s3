@@ -1,19 +1,19 @@
 {
-  "name": "docker-s3fs",
+  "name": "docker-mount-s3",
   "version": "2.0.9",
-  "description": "Docker S3FS Volume Plugins\r =============================",
+  "description": "Docker Mountpoint S3 Volume Plugin\r =============================",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aek/docker-s3fs.git"
+    "url": "git+https://github.com/aekis-dev/docker-mount-s3.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aek/docker-s3fs/issues"
+    "url": "https://github.com/aekis-dev/docker-mount-s3/issues"
   },
-  "homepage": "https://github.com/aek/docker-s3fs#readme"
+  "homepage": "https://github.com/aekis-dev/docker-mount-s3#readme"
 }

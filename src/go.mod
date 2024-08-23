@@ -1,4 +1,4 @@
-module docker-s3fs
+module docker-mount-s3
 
 go 1.22.2
 

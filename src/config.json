@@ -1,14 +1,14 @@
 {
-    "description": "Docker S3FS Volume Plugin",
-    "documentation": "https://github.com/aek/docker-s3fs/",
+    "description": "Docker Mountpoint S3 Volume Plugin",
+    "documentation": "https://github.com/aekis-dev/docker-mount-s3/",
     "entrypoint": [
         "/sbin/tini",
         "--",
-        "/docker-s3fs"
+        "/docker-mount-s3"
     ],
     "env": [
         {
-            "name": "DEFAULT_S3FSOPTS",
+            "name": "DEFAULT_MOUNT_S3OPTS",
             "settable": [
                 "value"
             ],
@@ -23,7 +23,7 @@
         "types": [
             "docker.volumedriver/1.0"
         ],
-        "socket": "s3fs.sock"
+        "socket": "mount-s3.sock"
     },
     "linux": {
         "capabilities": [

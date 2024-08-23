@@ -35,8 +35,8 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "go version",
 	
-	"workspaceMount": "source=${localWorkspaceFolder},target=/go/src/github.com/aek/docker-s3fs,type=bind,consistency=delegated",
-	"workspaceFolder": "/go/src/github.com/aek/docker-s3fs",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/go/src/github.com/aekis-dev/docker-mount-s3,type=bind,consistency=delegated",
+	"workspaceFolder": "/go/src/github.com/aekis-dev/docker-mount-s3",
 
 	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"

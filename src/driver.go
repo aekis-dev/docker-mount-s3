@@ -242,16 +242,12 @@ func (p *Driver) Mount(req *volume.MountRequest) (*volume.MountResponse, error) 
 
 	aws_key, aws_keyInOpts := volumeInfo.Options["AWS_ACCESS_KEY_ID"]
 	aws_secret, aws_secretInOpts := volumeInfo.Options["AWS_SECRET_ACCESS_KEY"]
-	aws_token, aws_tokenInOpts := volumeInfo.Options["AWS_SESSION_TOKEN"]
 
 	if aws_keyInOpts && aws_key != "" {
 		new_env = append(new_env, "AWS_ACCESS_KEY_ID="+aws_key)
 	}
 	if aws_secretInOpts && aws_secret != "" {
 		new_env = append(new_env, "AWS_SECRET_ACCESS_KEY="+aws_secret)
-	}
-	if aws_tokenInOpts && aws_token != "" {
-		new_env = append(new_env, "AWS_SESSION_TOKEN="+aws_token)
 	}
 	//fmt.Printf("new_env: %s\n", new_env)
 	cmd.Env = new_env
@@ -261,9 +257,9 @@ func (p *Driver) Mount(req *volume.MountRequest) (*volume.MountResponse, error) 
 		return &volume.MountResponse{}, fmt.Errorf("error mounting %s: %s", req.Name, err.Error())
 	} else {
 		cmd := exec.Command("df", "-T", mountPoint)
-		if out, err := cmd.CombinedOutput(); err != nil || strings.Index(string(out), p.mountExecutable) < 0 {
+		if out, err := cmd.CombinedOutput(); err != nil || strings.Index(string(out), "mountpoint-s3") < 0 {
 			fmt.Printf("df -T: %s\n", out)
-			return &volume.MountResponse{}, fmt.Errorf("error mounting %s:\n%s\nfstype should be %s", req.Name, out, p.mountExecutable)
+			return &volume.MountResponse{}, fmt.Errorf("error mounting %s:\n%s\nfstype should be %s", req.Name, out, "mountpoint-s3")
 		}
 	}
 	volumeInfo.MountPoint = mountPoint
