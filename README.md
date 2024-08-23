@@ -70,7 +70,7 @@ You could use the following command to manually create the volume:
 
 Existing Solutions involves creating one plugin per AWS Credentials, which is not practical when you need to manage multiple AWS Accounts.
 
-With those solutions you can't use the same plugin for all of them and you need to create a new plugin for each account and match the pluging alias with the credentials that you wanna use. 
+With those solutions you can't use the same plugin for all of them and you need to create a new plugin for each account and match the plugin alias with the credentials that you wanna use. 
 
 Those plugins are not flexible enough to allow you to use environment variables to provide the credentials when creating the volume for example in docker compose. 
 
