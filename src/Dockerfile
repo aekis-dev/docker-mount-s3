@@ -1,13 +1,14 @@
 FROM golang:1.22-alpine AS build
 
 ARG TARGETARCH
-ARG MOUNTPOINT_VERSION=1.8.0
+ARG MOUNTPOINT_VERSION=1.15.0
 
 RUN <<EOF
     apk update
     apk --no-cache add \
         ca-certificates \
         build-base \
+        gnupg \
         git \
         alpine-sdk \
         curl \
@@ -34,13 +35,6 @@ RUN <<EOF
 
     # set rpath for dynamic library loading
     patchelf --set-rpath '$ORIGIN' /mountpoint-s3/bin/mount-s3
-
-#    curl -L https://github.com/awslabs/mountpoint-s3/archive/refs/tags/mountpoint-s3-1.8.0.zip -o mount-s3.zip
-#    unzip mount-s3.zip
-#    cd mountpoint-s3-mountpoint-s3-1.8.0
-#    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source "$HOME/.cargo/env"
-#    cargo build --release
-#    mv target/release/mount-s3 /usr/local/bin/mount-s3
 EOF
 
 COPY src /src/

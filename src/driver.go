@@ -52,6 +52,39 @@ type Driver struct {
 	DriverCallback
 }
 
+// Add this function to handle state consistency between DB and actual mounts
+func (p *Driver) reconcileVolumeState() error {
+	tx, err := p.volumedb.Begin(true)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	volumeMap, err := p.getVolumeMap(tx)
+	if err != nil {
+		return err
+	}
+
+	// Check each volume that is marked as mounted
+	for name, info := range volumeMap {
+		if info.Status["mounted"] == true && info.MountPoint != "" {
+			// Verify the mount actually exists
+			if !isMountActive(info.MountPoint) {
+				log.Printf("Volume %s is marked as mounted but mount is not active, correcting state", name)
+				// Update status to not mounted
+				info.Status["mounted"] = false
+				info.MountPoint = ""
+				if err := p.storeVolumeInfo(tx, name, &info); err != nil {
+					log.Printf("Failed to update volume %s state: %s", name, err)
+					continue
+				}
+			}
+		}
+	}
+
+	return tx.Commit()
+}
+
 // Capabilities indicate to the swarm manager that this supports global scope.
 func (p *Driver) Capabilities() *volume.CapabilitiesResponse {
 	return &volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: p.scope}}
@@ -253,7 +286,8 @@ func (p *Driver) Mount(req *volume.MountRequest) (*volume.MountResponse, error) 
 	cmd.Env = new_env
 
 	if out, err := cmd.CombinedOutput(); err != nil {
-		fmt.Printf("Command output: %s\n", out)
+		log.Printf("Mount command failed: %s", err)
+		log.Printf("Command output: %s", out)
 		return &volume.MountResponse{}, fmt.Errorf("error mounting %s: %s", req.Name, err.Error())
 	} else {
 		cmd := exec.Command("df", "-T", mountPoint)
@@ -346,6 +380,7 @@ func NewDriver(mountExecutable string, mountPointAfterOptions bool, dockerSocket
 		log.Fatal(err)
 	}
 
+	// Create volume bucket if needed
 	db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(volumeBucket))
 		if err != nil {
@@ -362,5 +397,11 @@ func NewDriver(mountExecutable string, mountPointAfterOptions bool, dockerSocket
 		scope:                  scope,
 		m:                      &sync.RWMutex{},
 	}
+
+	// Reconcile volume state at startup
+	if err := d.reconcileVolumeState(); err != nil {
+		log.Printf("Warning: Failed to reconcile volume state: %s", err)
+	}
+
 	return d
 }

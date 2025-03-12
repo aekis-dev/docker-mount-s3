@@ -1,13 +1,14 @@
 FROM golang:1.22-alpine AS build
 
 ARG TARGETARCH
-ARG MOUNTPOINT_VERSION=1.8.0
+ARG MOUNTPOINT_VERSION=1.15.0
 
 RUN <<EOF
     apk update
     apk --no-cache add \
         ca-certificates \
         build-base \
+        gnupg \
         gcc \
         g++ \
         git \
