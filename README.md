@@ -61,6 +61,17 @@ You could directly set the credentials in the compose.yaml file.
           o: --allow-delete --allow-overwrite --allow-other --region=us-east-1
 
 
+Example using Cloudflare R2:
+
+    volumes:
+      volume_name:
+        driver: aekis/docker-mount-s3
+        driver_opts:
+          bucket: bucket_name
+          AWS_ACCESS_KEY_ID: XXXXXXAWS_ACCESS_KEY_IDXXXXXXX
+          AWS_SECRET_ACCESS_KEY: XXXXXXXXXXXXAWS_SECRET_ACCESS_KEYXXXXXXXXXXXX
+          o: --allow-delete --allow-overwrite --allow-other --upload-checksums=off --prefix=filestores/XXXUUIDXXX/ --metadata-ttl=indefinite --endpoint-url=https://XXXXXXCLOUDFLARE_ACCOUNTXXXXXX.r2.cloudflarestorage.com --region=auto --max-threads=32 --cache=/opt
+
 ## Docker Volume Create
 You could use the following command to manually create the volume:
     
